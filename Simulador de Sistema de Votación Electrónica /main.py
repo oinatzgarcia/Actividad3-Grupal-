@@ -1,48 +1,44 @@
-import os
-import socket
-import sys
 import hashlib
-import rsa
+import re
 
+# Función para crear un hash de votos
+def create_vote_hash(vote):
+    # Crear un hash del voto usando SHA-256
+    hash_object = hashlib.sha256(vote.encode())
+    return hash_object.hexdigest()
 
+# Función para validar el formato del DNI
+def validate_dni(dni):
+    # Verificar si el DNI tiene el formato correcto: 8 números seguidos de una letra
+    return bool(re.match(r'^\d{8}[A-Za-z]$', dni))
+
+# Simular una votación
 def main():
-    # Solicita al votante que introduzca su nombre y dirección IP.
-    name = input("Introduzca su nombre: ")
-    ip = socket.gethostbyname(socket.gethostname())
+    candidates = ["VOX", "PSOE", "SUMAR"]
 
-    # Genera un par de claves pública/privada para el votante.
-    public_key, private_key = rsa.newkeys(2048)
+    print("Bienvenido a la votación electrónica.")
+    dni = input("Por favor, ingrese su número de DNI: ")
 
-    # Envia la clave pública al servidor.
-    public_key_bytes = public_key.save_pkcs1(format="PEM")
-    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server_socket.connect(("localhost", 8000))
-    server_socket.sendall(public_key_bytes)
-    server_socket.close()
+    if validate_dni(dni):
+        print("Por favor, elija su candidato:")
+        for i, candidate in enumerate(candidates, start=1):
+            print(f"{i}. {candidate}")
 
-    # Presenta al votante una lista de candidatos.
-    candidates = ["Candidato 1", "Candidato 2", "Candidato 3"]
-    for candidate in candidates:
-        print(f"{candidate}")
+        vote = input("Ingrese el número del candidato elegido: ")
 
-    # El votante selecciona sus candidatos.
-    votes = []
-    for i in range(len(candidates)):
-        vote = input(f"¿Quiere votar por {candidates[i]}? (S/N): ")
-        if vote == "S":
-            votes.append(i)
+        try:
+            vote = int(vote)
+            if 1 <= vote <= len(candidates):
+                selected_candidate = candidates[vote - 1]
+                hashed_vote = create_vote_hash(selected_candidate + dni)  # Se agrega el DNI al voto antes de hacer el hash
+                print("Su voto ha sido registrado de manera segura.")
+                print(f"Hash de su voto: {hashed_vote}")
+            else:
+                print("Por favor, ingrese un número válido correspondiente al candidato.")
+        except ValueError:
+            print("Por favor, ingrese un número válido para el candidato.")
+    else:
+        print("El número de DNI ingresado no es válido o no tiene el formato adecuado (8 números seguidos de una letra).")
 
-    # Encripta los votos utilizando la clave pública del servidor.
-    encrypted_votes = []
-    for vote in votes:
-        encrypted_vote = public_key.encrypt(vote.encode())
-        encrypted_votes.append(encrypted_vote)
-
-    # Envia los votos encriptados al servidor.
-    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server_socket.connect(("localhost", 8000))
-    server_socket.sendall(encrypted_votes)
-    server_socket.close()
-
-    # Recibe un mensaje de confirmación del servidor.
-    confirmation = server_socket.
+if __name__ == "__main__":
+    main()
