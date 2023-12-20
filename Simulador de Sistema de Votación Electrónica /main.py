@@ -12,6 +12,11 @@ def validate_dni(dni):
     # Verificar si el DNI tiene el formato correcto: 8 números seguidos de una letra
     return bool(re.match(r'^\d{8}[A-Za-z]$', dni))
 
+# Función para escribir el hash en un archivo externo
+def write_hash_to_file(hashed_vote):
+    with open('hashed_vote.txt', 'w') as file:
+        file.write(hashed_vote)
+
 # Simular una votación
 def main():
     candidates = ["VOX", "PSOE", "SUMAR"]
@@ -33,6 +38,10 @@ def main():
                 hashed_vote = create_vote_hash(selected_candidate + dni)  # Se agrega el DNI al voto antes de hacer el hash
                 print("Su voto ha sido registrado de manera segura.")
                 print(f"Hash de su voto: {hashed_vote}")
+
+                # Escribir el hash en un archivo externo
+                write_hash_to_file(hashed_vote)
+                print("El hash se ha guardado en hashed_vote.txt.")
             else:
                 print("Por favor, ingrese un número válido correspondiente al candidato.")
         except ValueError:
