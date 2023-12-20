@@ -14,8 +14,12 @@ def validate_dni(dni):
 
 # Función para escribir el hash en un archivo externo
 def write_hash_to_file(hashed_vote):
-    with open('hashed_vote.txt', 'w') as file:
-        file.write(hashed_vote)
+    try:
+        with open('hashed_vote.txt', 'w') as file:
+            file.write(hashed_vote)
+        print("El hash se ha guardado en hashed_vote.txt.")
+    except IOError:
+        print("Error al intentar escribir el archivo.")
 
 # Simular una votación
 def main():
