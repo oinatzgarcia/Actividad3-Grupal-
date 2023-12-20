@@ -2,59 +2,59 @@ import filecmp
 import hashlib
 import re
 
-# Función para crear un hash de votos
+# Function to create a hash of votes
 def create_vote_hash(vote):
-    # Crear un hash del voto usando SHA-256
+    # Creating a hash of the vote using SHA-256
     hash_object = hashlib.sha256(vote.encode())
     return hash_object.hexdigest()
 
-# Función para validar el formato del DNI
+# Function to validate the ID format
 def validate_dni(dni):
-    # Verificar si el DNI tiene el formato correcto: 8 números seguidos de una letra
+    # Verifying if the ID has the correct format: 8 numbers followed by a letter
     return bool(re.match(r'^\d{8}[A-Za-z]$', dni))
 
-# Función para escribir el hash en un archivo externo
+# Function to write the hash to an external file
 def write_hash_to_file(hashed_vote):
     filename = 'hashed_votes.txt'
     try:
         with open(filename, 'a') as file:
             file.write(hashed_vote + '\n')
-        print(f"El hash se ha guardado en {filename}.")
+        print(f"The hash has been saved to {filename}.")
     except IOError:
-        print("Error al intentar escribir en el archivo.")
+        print("Error attempting to write to the file.")
 
-
-# Simular una votación
+# Simulating a vote
 def main():
     candidates = ["VOX", "PSOE", "SUMAR"]
 
-    print("Bienvenido a la votación electrónica.")
-    dni = input("Por favor, ingrese su número de DNI: ")
+    print("Welcome to the electronic voting system.")
+    dni = input("Please enter your ID number: ")
 
     if validate_dni(dni):
-        print("Por favor, elija su candidato:")
+        print("Please choose your candidate:")
         for i, candidate in enumerate(candidates, start=1):
             print(f"{i}. {candidate}")
 
-        vote = input("Ingrese el número del candidato elegido: ")
+        vote = input("Enter the number of your chosen candidate: ")
 
         try:
             vote = int(vote)
             if 1 <= vote <= len(candidates):
                 selected_candidate = candidates[vote - 1]
-                hashed_vote = create_vote_hash(selected_candidate + dni)  # Se agrega el DNI al voto antes de hacer el hash
-                print("Su voto ha sido registrado de manera segura.")
-                print(f"Hash de su voto: {hashed_vote}")
+                hashed_vote = create_vote_hash(selected_candidate + dni)  # Adding the ID to the vote before hashing
+                print("Your vote has been securely registered.")
+                print(f"Hash of your vote: {hashed_vote}")
 
-                # Escribir el hash en un archivo externo
+                # Writing the hash to an external file
                 write_hash_to_file(hashed_vote)
-                print("El hash se ha guardado en hashed_vote.txt.")
+                print("The hash has been saved to hashed_vote.txt.")
             else:
-                print("Por favor, ingrese un número válido correspondiente al candidato.")
+                print("Please enter a valid number corresponding to the candidate.")
         except ValueError:
-            print("Por favor, ingrese un número válido para el candidato.")
+            print("Please enter a valid number for the candidate.")
     else:
-        print("El número de DNI ingresado no es válido o no tiene el formato adecuado (8 números seguidos de una letra).")
+        print("The entered ID number is not valid or doesn't have the correct format (8 numbers followed by a letter).")
 
 if __name__ == "__main__":
     main()
+
